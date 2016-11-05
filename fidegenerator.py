@@ -50,7 +50,7 @@ def explicit(lista_doc):
     lista_doc.extend((data, autorita, nome_autorita, firma))
     return lista_doc
 
-def bolkestein(titolare='Tizio', extitolare='Caio', comune='Ancona'):
+def bolkestein(comune, indirizzo, titolare, extitolare, n_vecchia_autorizzazione, data_vecchia_autorizzazione):
     canovaccio = []
     testo = '''
 <para spacea=35>Con la presente si attesta che il comune di {} ha recepito
@@ -58,7 +58,7 @@ la direttiva Bolkestein (D.Lgs.n.59/2010) e pertanto il Sig. {}
 avvia una nuova attività di rivendita di giornali e riviste
 a {} in via {}, dietro presentazione di SCIA agli Uffici
 Comunali Competenti.</para>
-'''.format(titolare, extitolare, comune, comune)
+'''.format(comune, titolare, comune, indirizzo)
     doc = SimpleDocTemplate('bolkestein.pdf',
                             pagesize=A4,
                             rightMargin=25*mm,
@@ -72,7 +72,7 @@ Comunali Competenti.</para>
     explicit(canovaccio)
     doc.build(canovaccio)
 
-def iscrizione(titolare='Tizio', comune='Canigattì', indirizzo='via Puccini 20'):
+def iscrizione(comune, indirizzo, titolare, extitolare, n_vecchia_autorizzazione, data_vecchia_autorizzazione):
     canovaccio = []
     testo = '''
 <para spacea=35>Con la presente si attesta che {}, gestore della rivendita di quotidiani
@@ -91,7 +91,7 @@ Ancona di questo Sindacato.</para>
     explicit(canovaccio)
     doc.build(canovaccio)
 
-def modello_a(titolare='Tizio', comune='Canigattì', indirizzo='via Puccini 20', num_autorizzazione='xx', data_autorizzazione='12/12/12', extitolare='Pinocchio'):
+def modello_a(comune, indirizzo, titolare, extitolare, n_vecchia_autorizzazione, data_vecchia_autorizzazione, stato_procedura):
     canovaccio = []
     testo = '''
 Con la presente si attesta che ii comune di {} ha recepito la
@@ -99,13 +99,18 @@ direttiva Bolkestein (D.Lgs.n.59/2010) e che, per quanto a nostra conoscenza,
 nulla osta al subentro di {} nella titolarità dell'autorizzazione n. {} del {}
 per la vendita di quotidiani e periodici già rilasciata a {} relativa al punto
 vendita a carattere permanente, ubicato a {} in {}.
-'''.format(comune, titolare, num_autorizzazione, data_autorizzazione, extitolare, comune, indirizzo)
-    testo2 = '''
+'''.format(comune, titolare, n_vecchia_autorizzazione, data_vecchia_autorizzazione, extitolare, comune, indirizzo)
+    testo_procedura_perfezionata = '''
 Si attesta inoltre che la suddetta procedura deve intendersi perfezionata
 con l'avvenuto subentro senza rilascio da parte del Comune di una nuova
 autorizzazione/licenza intestata al subentrante.
 '''
-    testo3 = '''
+    testo_procedura_da_perfezionare = '''
+Si attesta inoltre che la suddetta procedura sarà perfezionata previo rilascio
+da parte del Comune, nei tempi da esso previsti, di una nuova autorizzazione/licenza
+intestata al subentrante
+'''
+    testo2 = '''
 <para spacea=35>Il sottoscritto si impegna a comunicare tempestivamente
 eventuali dinieghi al subentro da parte delle preposte autorità comunali.</para>
 '''
@@ -119,12 +124,15 @@ eventuali dinieghi al subentro da parte delle preposte autorità comunali.</para
     canovaccio.append(Paragraph('<para align=right>Allegato A</para>', stili['testo_standard']))
     canovaccio.append(Paragraph('<para align=center spacea=20><strong>DICHIARAZIONE</strong></para>', stili['testo_standard']))
     canovaccio.append(Paragraph(testo, stili['testo_standard']))
+    if stato_procedura == 1:
+        canovaccio.append(Paragraph(testo_procedura_perfezionata, stili['testo_standard']))
+    else:
+        canovaccio.append(Paragraph(testo_procedura_da_perfezionare, stili['testo_standard']))
     canovaccio.append(Paragraph(testo2, stili['testo_standard']))
-    canovaccio.append(Paragraph(testo3, stili['testo_standard']))
     explicit(canovaccio)
     doc.build(canovaccio)
 
-def permanente(comune='Canigattì', indirizzo='via Puccini 20', titolare='Tizio Tizione'):
+def permanente(comune, indirizzo, titolare, extitolare, n_vecchia_autorizzazione, data_vecchia_autorizzazione):
     canovaccio = []
     testo = '''
 <para spacea=35>Con la presente si attesta che la rivendita di quotidiani e periodici sita
@@ -157,11 +165,49 @@ class MyWin(QDialog):
         self.show()
 
     def genera_documenti(self):
-        self.variabile = self.lineEdit.text()
-        bolkestein(self.variabile)
-        iscrizione()
-        modello_a()
-        permanente()
+        self.titolare = self.line_titolare.text()
+        self.comune = self.line_comune.text()
+        self.indirizzo = self.line_indirizzo.text()
+        self.ex_titolare = self.line_extitolare.text()
+        self.n_licenza = self.line_nlicenza.text()
+        self.data_licenza = self.line_datalicenza.text()
+        if self.radio_perfezionata.isChecked():
+            self.stato_procedura = 1
+        else:
+            self.stato_procedura = 0
+        bolkestein(self.comune,
+                   self.indirizzo,
+                   self.titolare,
+                   self.ex_titolare,
+                   self.n_licenza,
+                   self.data_licenza
+                   )
+        self.progressBar.setValue(25)
+        iscrizione(self.comune,
+                   self.indirizzo,
+                   self.titolare,
+                   self.ex_titolare,
+                   self.n_licenza,
+                   self.data_licenza
+                   )
+        self.progressBar.setValue(50)
+        permanente(self.comune,
+                   self.indirizzo,
+                   self.titolare,
+                   self.ex_titolare,
+                   self.n_licenza,
+                   self.data_licenza
+                   )
+        self.progressBar.setValue(75)
+        modello_a(self.comune,
+                  self.indirizzo,
+                  self.titolare,
+                  self.ex_titolare,
+                  self.n_licenza,
+                  self.data_licenza,
+                  self.stato_procedura
+                  )
+        self.progressBar.setValue(100)
 
 
 ################
