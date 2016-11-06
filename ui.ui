@@ -29,8 +29,8 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>179</y>
+     <x>0</x>
+     <y>200</y>
      <width>257</width>
      <height>61</height>
     </rect>
@@ -61,8 +61,8 @@
   <widget class="QCalendarWidget" name="calendarWidget">
    <property name="geometry">
     <rect>
-     <x>57</x>
-     <y>268</y>
+     <x>190</x>
+     <y>290</y>
      <width>272</width>
      <height>149</height>
     </rect>
@@ -83,8 +83,8 @@
   <widget class="QLabel" name="label_7">
    <property name="geometry">
     <rect>
-     <x>57</x>
-     <y>248</y>
+     <x>180</x>
+     <y>260</y>
      <width>135</width>
      <height>16</height>
     </rect>
@@ -106,13 +106,13 @@
     <number>0</number>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>9</x>
      <y>9</y>
      <width>291</width>
-     <height>164</height>
+     <height>192</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -129,7 +129,7 @@
     <item row="0" column="1">
      <widget class="QLineEdit" name="line_titolare"/>
     </item>
-    <item row="1" column="0">
+    <item row="2" column="0">
      <widget class="QLabel" name="label_2">
       <property name="text">
        <string>Comune</string>
@@ -139,10 +139,10 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
+    <item row="2" column="1">
      <widget class="QLineEdit" name="line_comune"/>
     </item>
-    <item row="2" column="0">
+    <item row="3" column="0">
      <widget class="QLabel" name="label_3">
       <property name="text">
        <string>Indirizzo</string>
@@ -152,10 +152,10 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
+    <item row="3" column="1">
      <widget class="QLineEdit" name="line_indirizzo"/>
     </item>
-    <item row="3" column="0">
+    <item row="4" column="0">
      <widget class="QLabel" name="label_4">
       <property name="text">
        <string>Ex titolare</string>
@@ -165,10 +165,10 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
+    <item row="4" column="1">
      <widget class="QLineEdit" name="line_extitolare"/>
     </item>
-    <item row="4" column="0">
+    <item row="5" column="0">
      <widget class="QLabel" name="label_5">
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;N. vecchia licenza&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -178,10 +178,10 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="1">
+    <item row="5" column="1">
      <widget class="QLineEdit" name="line_nlicenza"/>
     </item>
-    <item row="5" column="0">
+    <item row="6" column="0">
      <widget class="QLabel" name="label_6">
       <property name="text">
        <string>Data rilascio vecchia licenza</string>
@@ -191,8 +191,39 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="1">
+    <item row="6" column="1">
      <widget class="QLineEdit" name="line_datalicenza"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_8">
+      <property name="text">
+       <string>Sesso</string>
+      </property>
+      <property name="buddy">
+       <cstring>radio_sessof</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QRadioButton" name="radio_sessom">
+        <property name="text">
+         <string>M</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radio_sessof">
+        <property name="text">
+         <string>F</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

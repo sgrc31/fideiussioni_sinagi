@@ -50,15 +50,15 @@ def explicit(lista_doc):
     lista_doc.extend((data, autorita, nome_autorita, firma))
     return lista_doc
 
-def bolkestein(comune, indirizzo, titolare, extitolare, n_vecchia_autorizzazione, data_vecchia_autorizzazione):
+def bolkestein(comune, indirizzo, titolare, sesso_titolare):
     canovaccio = []
     testo = '''
 <para spacea=35>Con la presente si attesta che il comune di {} ha recepito
-la direttiva Bolkestein (D.Lgs.n.59/2010) e pertanto il Sig. {} 
+la direttiva Bolkestein (D.Lgs.n.59/2010) e pertanto {} {} 
 avvia una nuova attività di rivendita di giornali e riviste
 a {} in via {}, dietro presentazione di SCIA agli Uffici
 Comunali Competenti.</para>
-'''.format(comune, titolare, comune, indirizzo)
+'''.format(comune, 'il Sig.' if sesso_titolare == 'm' else 'la Sig.ra', titolare, comune, indirizzo)
     doc = SimpleDocTemplate('bolkestein.pdf',
                             pagesize=A4,
                             rightMargin=25*mm,
@@ -72,13 +72,13 @@ Comunali Competenti.</para>
     explicit(canovaccio)
     doc.build(canovaccio)
 
-def iscrizione(comune, indirizzo, titolare, extitolare, n_vecchia_autorizzazione, data_vecchia_autorizzazione):
+def iscrizione(comune, indirizzo, titolare, sesso_titolare):
     canovaccio = []
     testo = '''
 <para spacea=35>Con la presente si attesta che {}, gestore della rivendita di quotidiani
-e periodici sita a {}, in {} è iscritta/o alla struttura territoriale di
+e periodici sita a {}, in {} è iscritt{} alla struttura territoriale di
 Ancona di questo Sindacato.</para>
-'''.format(titolare, comune, indirizzo)
+'''.format(titolare, comune, indirizzo, 'o' if sesso_titolare == 'm' else 'a')
     doc = SimpleDocTemplate('iscrizione.pdf',
                             pagesize=A4,
                             rightMargin=25*mm,
@@ -94,7 +94,7 @@ Ancona di questo Sindacato.</para>
 def modello_a(comune, indirizzo, titolare, extitolare, n_vecchia_autorizzazione, data_vecchia_autorizzazione, stato_procedura):
     canovaccio = []
     testo = '''
-Con la presente si attesta che ii comune di {} ha recepito la
+Con la presente si attesta che il comune di {} ha recepito la
 direttiva Bolkestein (D.Lgs.n.59/2010) e che, per quanto a nostra conoscenza,
 nulla osta al subentro di {} nella titolarità dell'autorizzazione n. {} del {}
 per la vendita di quotidiani e periodici già rilasciata a {} relativa al punto
@@ -132,7 +132,7 @@ eventuali dinieghi al subentro da parte delle preposte autorità comunali.</para
     explicit(canovaccio)
     doc.build(canovaccio)
 
-def permanente(comune, indirizzo, titolare, extitolare, n_vecchia_autorizzazione, data_vecchia_autorizzazione):
+def permanente(comune, indirizzo, titolare):
     canovaccio = []
     testo = '''
 <para spacea=35>Con la presente si attesta che la rivendita di quotidiani e periodici sita
@@ -171,6 +171,10 @@ class MyWin(QDialog):
         self.ex_titolare = self.line_extitolare.text()
         self.n_licenza = self.line_nlicenza.text()
         self.data_licenza = self.line_datalicenza.text()
+        if self.radio_sessom.isChecked():
+            self.sesso_titolare = 'm'
+        else:
+            self.sesso_titolare = 'f'
         if self.radio_perfezionata.isChecked():
             self.stato_procedura = 1
         else:
@@ -178,25 +182,18 @@ class MyWin(QDialog):
         bolkestein(self.comune,
                    self.indirizzo,
                    self.titolare,
-                   self.ex_titolare,
-                   self.n_licenza,
-                   self.data_licenza
+                   self.sesso_titolare
                    )
         self.progressBar.setValue(25)
         iscrizione(self.comune,
                    self.indirizzo,
                    self.titolare,
-                   self.ex_titolare,
-                   self.n_licenza,
-                   self.data_licenza
+                   self.sesso_titolare
                    )
         self.progressBar.setValue(50)
         permanente(self.comune,
                    self.indirizzo,
-                   self.titolare,
-                   self.ex_titolare,
-                   self.n_licenza,
-                   self.data_licenza
+                   self.titolare
                    )
         self.progressBar.setValue(75)
         modello_a(self.comune,
