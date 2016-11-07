@@ -2,15 +2,14 @@
 
 import sys
 import time
-from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QPushButton, QCalendarWidget, QHBoxLayout, QVBoxLayout, QDialog, QTextEdit, QFileDialog, QMessageBox
-from PyQt5.QtCore import QDate
+#from PyQt5.QtCore import QDate
+from PyQt5.QtWidgets import QApplication, QWidget, QDialog
 from PyQt5 import uic
-from reportlab.pdfgen import canvas
 from reportlab.lib import utils
 from reportlab.lib.units import mm
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER, TA_LEFT, TA_RIGHT
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 stili = getSampleStyleSheet()
@@ -124,10 +123,7 @@ eventuali dinieghi al subentro da parte delle preposte autorità comunali.</para
     canovaccio.append(Paragraph('<para align=right>Allegato A</para>', stili['testo_standard']))
     canovaccio.append(Paragraph('<para align=center spacea=20><strong>DICHIARAZIONE</strong></para>', stili['testo_standard']))
     canovaccio.append(Paragraph(testo, stili['testo_standard']))
-    if stato_procedura == 1:
-        canovaccio.append(Paragraph(testo_procedura_perfezionata, stili['testo_standard']))
-    else:
-        canovaccio.append(Paragraph(testo_procedura_da_perfezionare, stili['testo_standard']))
+    canovaccio.append(Paragraph(testo_procedura_perfezionata if stato_procedura == 1 else testo_procedura_da_perfezionare, stili['testo_standard']))
     canovaccio.append(Paragraph(testo2, stili['testo_standard']))
     explicit(canovaccio)
     doc.build(canovaccio)
@@ -161,16 +157,32 @@ class MyWin(QDialog):
 
     def initUI(self):
         uic.loadUi('ui.ui', self)
-        self.pushButton.clicked.connect(self.genera_documenti)
+        self.pushButton.clicked.connect(self.raccogli_variabili)
         self.show()
 
-    def genera_documenti(self):
-        self.titolare = self.line_titolare.text()
-        self.comune = self.line_comune.text()
-        self.indirizzo = self.line_indirizzo.text()
-        self.ex_titolare = self.line_extitolare.text()
-        self.n_licenza = self.line_nlicenza.text()
-        self.data_licenza = self.line_datalicenza.text()
+    def warning_campo_vuoto(self):
+        self.warning = QMessageBox()
+        self.warning.setText('Accertarsi di aver compilato tutti i campi')
+        self.warning.setWindowTitle('Warning')
+        self.warning.setStandardButtons(QMessageBox.Ok)
+        self.warning.exec_()
+
+    def raccogli_variabili(self):
+        if all((self.line_comune.text(),
+                self.line_datalicenza.text(),
+                self.line_extitolare.text(),
+                self.line_indirizzo.text(),
+                self.line_nlicenza.text(),
+                self.line_titolare.text()
+                )):
+            self.titolare = self.line_titolare.text()
+            self.comune = self.line_comune.text()
+            self.indirizzo = self.line_indirizzo.text()
+            self.ex_titolare = self.line_extitolare.text()
+            self.n_licenza = self.line_nlicenza.text()
+            self.data_licenza = self.line_datalicenza.text()
+        else:
+            return self.warning_campo_vuoto()
         if self.radio_sessom.isChecked():
             self.sesso_titolare = 'm'
         else:
@@ -179,6 +191,9 @@ class MyWin(QDialog):
             self.stato_procedura = 1
         else:
             self.stato_procedura = 0
+        self.genera_documenti()
+
+    def genera_documenti(self):
         bolkestein(self.comune,
                    self.indirizzo,
                    self.titolare,
