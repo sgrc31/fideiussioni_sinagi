@@ -2,8 +2,8 @@
 
 import sys
 import time
-#from PyQt5.QtCore import QDate
-from PyQt5.QtWidgets import QApplication, QWidget, QDialog
+from PyQt5.QtCore import QDate, QDateTime
+from PyQt5.QtWidgets import QApplication, QWidget, QDialog, QMessageBox
 from PyQt5 import uic
 from reportlab.lib import utils
 from reportlab.lib.units import mm
@@ -40,16 +40,16 @@ def intestazione_sinagi(lista_doc):
     lista_doc.extend((acronimo, titolo, logo, segreteria, contatti1, contatti2, contatti3))
     return lista_doc
 
-def explicit(lista_doc):
+def explicit(lista_doc, data_firma):
     firma = get_resized_img('xfirmaGS.jpeg', width=50*mm)
     firma.hAlign = 'RIGHT'
     autorita = Paragraph('<para align=right>Il segratario provinciale</para>', stili['testo_standard'])
     nome_autorita = Paragraph('<para align=right><strong>Sandro Guercio</strong></para>', stili['testo_standard'])
-    data = Paragraph('Ancona, {}'.format(time.strftime("%d/%m/%Y")), stili['testo_standard'])
+    data = Paragraph('Ancona, {}'.format(data_firma), stili['testo_standard'])
     lista_doc.extend((data, autorita, nome_autorita, firma))
     return lista_doc
 
-def bolkestein(comune, indirizzo, titolare, sesso_titolare):
+def bolkestein(comune, indirizzo, titolare, sesso_titolare, data_firma):
     canovaccio = []
     testo = '''
 <para spacea=35>Con la presente si attesta che il comune di {} ha recepito
@@ -68,10 +68,10 @@ Comunali Competenti.</para>
     canovaccio.append(Paragraph('<para align=right>Allegato A</para>', stili['testo_standard']))
     canovaccio.append(Paragraph('<para align=center spacea=20><strong>DICHIARAZIONE</strong></para>', stili['testo_standard']))
     canovaccio.append(Paragraph(testo, stili['testo_standard']))
-    explicit(canovaccio)
+    explicit(canovaccio, data_firma)
     doc.build(canovaccio)
 
-def iscrizione(comune, indirizzo, titolare, sesso_titolare):
+def iscrizione(comune, indirizzo, titolare, sesso_titolare, data_firma):
     canovaccio = []
     testo = '''
 <para spacea=35>Con la presente si attesta che {}, gestore della rivendita di quotidiani
@@ -87,10 +87,10 @@ Ancona di questo Sindacato.</para>
     intestazione_sinagi(canovaccio)
     canovaccio.append(Paragraph('<para align=center spacea=20><strong>DICHIARAZIONE</strong></para>', stili['testo_standard']))
     canovaccio.append(Paragraph(testo, stili['testo_standard']))
-    explicit(canovaccio)
+    explicit(canovaccio, data_firma)
     doc.build(canovaccio)
 
-def modello_a(comune, indirizzo, titolare, extitolare, n_vecchia_autorizzazione, data_vecchia_autorizzazione, stato_procedura):
+def modello_a(comune, indirizzo, titolare, extitolare, n_vecchia_autorizzazione, data_vecchia_autorizzazione, stato_procedura, data_firma):
     canovaccio = []
     testo = '''
 Con la presente si attesta che il comune di {} ha recepito la
@@ -125,10 +125,10 @@ eventuali dinieghi al subentro da parte delle preposte autorità comunali.</para
     canovaccio.append(Paragraph(testo, stili['testo_standard']))
     canovaccio.append(Paragraph(testo_procedura_perfezionata if stato_procedura == 1 else testo_procedura_da_perfezionare, stili['testo_standard']))
     canovaccio.append(Paragraph(testo2, stili['testo_standard']))
-    explicit(canovaccio)
+    explicit(canovaccio, data_firma)
     doc.build(canovaccio)
 
-def permanente(comune, indirizzo, titolare):
+def permanente(comune, indirizzo, titolare, data_firma):
     canovaccio = []
     testo = '''
 <para spacea=35>Con la presente si attesta che la rivendita di quotidiani e periodici sita
@@ -143,7 +143,7 @@ a {} in {}, gestita da {} è a carattere permanente.</para>
     intestazione_sinagi(canovaccio)
     canovaccio.append(Paragraph('<para align=center spacea=20><strong>DICHIARAZIONE</strong></para>', stili['testo_standard']))
     canovaccio.append(Paragraph(testo, stili['testo_standard']))
-    explicit(canovaccio)
+    explicit(canovaccio, data_firma)
     doc.build(canovaccio)
 
 
@@ -158,6 +158,9 @@ class MyWin(QDialog):
     def initUI(self):
         uic.loadUi('ui.ui', self)
         self.pushButton.clicked.connect(self.raccogli_variabili)
+        self.date_vecchialicenza.setDateTime(QDateTime.currentDateTime())
+        self.date_firma.setDateTime(QDateTime.currentDateTime())
+        self.setWindowTitle('SINAGI - genera fideiussioni')
         self.show()
 
     def warning_campo_vuoto(self):
@@ -167,9 +170,15 @@ class MyWin(QDialog):
         self.warning.setStandardButtons(QMessageBox.Ok)
         self.warning.exec_()
 
+    def warning_stesse_date(self):
+        self.warning2 = QMessageBox()
+        self.warning2.setText('Le date non possono coincidere, accertarsi di aver inserito le date corrette')
+        self.warning2.setWindowTitle('Attenzione')
+        self.warning2.setStandardButtons(QMessageBox.Ok)
+        self.warning2.exec_()
+
     def raccogli_variabili(self):
         if all((self.line_comune.text(),
-                self.line_datalicenza.text(),
                 self.line_extitolare.text(),
                 self.line_indirizzo.text(),
                 self.line_nlicenza.text(),
@@ -180,9 +189,13 @@ class MyWin(QDialog):
             self.indirizzo = self.line_indirizzo.text()
             self.ex_titolare = self.line_extitolare.text()
             self.n_licenza = self.line_nlicenza.text()
-            self.data_licenza = self.line_datalicenza.text()
         else:
             return self.warning_campo_vuoto()
+        if self.date_vecchialicenza.date() == self.date_firma.date():
+            return self.warning_stesse_date()
+        else:
+            self.data_licenza = self.date_vecchialicenza.date().toString('dd/MM/yy')
+            self.data_firma = self.date_firma.date().toString('dd/MM/yyyy')
         if self.radio_sessom.isChecked():
             self.sesso_titolare = 'm'
         else:
@@ -197,18 +210,21 @@ class MyWin(QDialog):
         bolkestein(self.comune,
                    self.indirizzo,
                    self.titolare,
-                   self.sesso_titolare
+                   self.sesso_titolare,
+                   self.data_firma
                    )
         self.progressBar.setValue(25)
         iscrizione(self.comune,
                    self.indirizzo,
                    self.titolare,
-                   self.sesso_titolare
+                   self.sesso_titolare,
+                   self.data_firma
                    )
         self.progressBar.setValue(50)
         permanente(self.comune,
                    self.indirizzo,
-                   self.titolare
+                   self.titolare,
+                   self.data_firma
                    )
         self.progressBar.setValue(75)
         modello_a(self.comune,
@@ -217,7 +233,8 @@ class MyWin(QDialog):
                   self.ex_titolare,
                   self.n_licenza,
                   self.data_licenza,
-                  self.stato_procedura
+                  self.stato_procedura,
+                  self.data_firma
                   )
         self.progressBar.setValue(100)
 
