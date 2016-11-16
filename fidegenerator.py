@@ -2,7 +2,7 @@
 
 import sys
 import time
-from PyQt5.QtCore import QDate, QDateTime
+from PyQt5.QtCore import QDateTime
 from PyQt5.QtWidgets import QApplication, QWidget, QDialog, QMessageBox
 from PyQt5 import uic
 from reportlab.lib import utils
@@ -27,6 +27,9 @@ def get_resized_img(path, width=10*mm):
     iw, ih = img.getSize()
     aspect = ih / float(iw)
     return Image(path, width=width, height=(width * aspect))
+
+def nome_titolare_to_file(titolare):
+    return titolare.strip().lower().replace('\'', '').replace(' ', '')
 
 def intestazione_sinagi(lista_doc):
     acronimo = Paragraph('<para alignment=center fontsize=22 spacea=15><strong>SI.NA.G.I</strong></para>', stili['testo_standard'])
@@ -58,7 +61,7 @@ avvia una nuova attività di rivendita di giornali e riviste
 a {} in via {}, dietro presentazione di SCIA agli Uffici
 Comunali Competenti.</para>
 '''.format(comune, 'il Sig.' if sesso_titolare == 'm' else 'la Sig.ra', titolare, comune, indirizzo)
-    doc = SimpleDocTemplate('bolkestein.pdf',
+    doc = SimpleDocTemplate('{}_bolkestein.pdf'.format(nome_titolare_to_file(titolare)),
                             pagesize=A4,
                             rightMargin=25*mm,
                             leftMargin=25*mm,
@@ -78,7 +81,7 @@ def iscrizione(comune, indirizzo, titolare, sesso_titolare, data_firma):
 e periodici sita a {}, in {} è iscritt{} alla struttura territoriale di
 Ancona di questo Sindacato.</para>
 '''.format(titolare, comune, indirizzo, 'o' if sesso_titolare == 'm' else 'a')
-    doc = SimpleDocTemplate('iscrizione.pdf',
+    doc = SimpleDocTemplate('{}_iscrizione.pdf'.format(nome_titolare_to_file(titolare)),
                             pagesize=A4,
                             rightMargin=25*mm,
                             leftMargin=25*mm,
@@ -113,7 +116,7 @@ intestata al subentrante
 <para spacea=35>Il sottoscritto si impegna a comunicare tempestivamente
 eventuali dinieghi al subentro da parte delle preposte autorità comunali.</para>
 '''
-    doc = SimpleDocTemplate('modello_a.pdf',
+    doc = SimpleDocTemplate('{}_modello_a.pdf'.format(nome_titolare_to_file(titolare)),
                             pagesize=A4,
                             rightMargin=25*mm,
                             leftMargin=25*mm,
@@ -134,7 +137,7 @@ def permanente(comune, indirizzo, titolare, data_firma):
 <para spacea=35>Con la presente si attesta che la rivendita di quotidiani e periodici sita
 a {} in {}, gestita da {} è a carattere permanente.</para>
 '''.format(comune, indirizzo, titolare)
-    doc = SimpleDocTemplate('permanente.pdf',
+    doc = SimpleDocTemplate('{}_permanente.pdf'.format(nome_titolare_to_file(titolare)),
                             pagesize=A4,
                             rightMargin=25*mm,
                             leftMargin=25*mm,
