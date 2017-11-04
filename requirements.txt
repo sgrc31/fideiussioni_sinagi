@@ -1,0 +1,6 @@
+olefile==0.44
+Pillow==4.3.0
+pkg-resources==0.0.0
+PyQt5==5.9
+reportlab==3.4.0
+sip==4.19.3
