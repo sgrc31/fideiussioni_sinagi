@@ -149,6 +149,26 @@ a {} in {}, gestita da {} è a carattere permanente.</para>
     explicit(canovaccio, data_firma)
     doc.build(canovaccio)
 
+def warning_campo_vuoto():
+    warning = QMessageBox()
+    warning.setText('Accertarsi di aver compilato tutti i campi')
+    warning.setWindowTitle('Errore')
+    warning.setStandardButtons(QMessageBox.Ok)
+    warning.exec_()
+
+def warning_stesse_date():
+    warning = QMessageBox()
+    warning.setText('Le date non possono coincidere, accertarsi di aver inserito le date corrette')
+    warning.setWindowTitle('Errore')
+    warning.setStandardButtons(QMessageBox.Ok)
+    warning.exec_()
+
+def warning_errore_cronologico():
+    warning = QMessageBox()
+    warning.setText('La data della vecchia licenza deve essere antecedente alla data di firma dei documenti.\nControlla nuovamente le date')
+    warning.setWindowTitle('Errore')
+    warning.setStandardButtons(QMessageBox.Ok)
+    warning.exec_()
 
 #################
 ##      UI     ##
@@ -163,22 +183,8 @@ class MyWin(QDialog):
         self.pushButton.clicked.connect(self.raccogli_variabili)
         self.date_vecchialicenza.setDateTime(QDateTime.currentDateTime())
         self.date_firma.setDateTime(QDateTime.currentDateTime())
-        self.setWindowTitle('SINAGI - genera fideiussioni')
+        self.setWindowTitle('SINAGI - generatore fideiussioni')
         self.show()
-
-    def warning_campo_vuoto(self):
-        self.warning = QMessageBox()
-        self.warning.setText('Accertarsi di aver compilato tutti i campi')
-        self.warning.setWindowTitle('Warning')
-        self.warning.setStandardButtons(QMessageBox.Ok)
-        self.warning.exec_()
-
-    def warning_stesse_date(self):
-        self.warning2 = QMessageBox()
-        self.warning2.setText('Le date non possono coincidere, accertarsi di aver inserito le date corrette')
-        self.warning2.setWindowTitle('Attenzione')
-        self.warning2.setStandardButtons(QMessageBox.Ok)
-        self.warning2.exec_()
 
     def raccogli_variabili(self):
         if all((self.line_comune.text(),
@@ -193,9 +199,11 @@ class MyWin(QDialog):
             self.ex_titolare = self.line_extitolare.text()
             self.n_licenza = self.line_nlicenza.text()
         else:
-            return self.warning_campo_vuoto()
+            return warning_campo_vuoto()
         if self.date_vecchialicenza.date() == self.date_firma.date():
-            return self.warning_stesse_date()
+            return warning_stesse_date()
+        elif self.date_vecchialicenza.date() > self.date_firma.date():
+            return warning_errore_cronologico()
         else:
             self.data_licenza = self.date_vecchialicenza.date().toString('dd/MM/yy')
             self.data_firma = self.date_firma.date().toString('dd/MM/yyyy')
