@@ -35,9 +35,9 @@ def intestazione_sinagi(lista_doc):
     acronimo = Paragraph('<para alignment=center fontsize=22 spacea=15><strong>SI.NA.G.I</strong></para>', stili['testo_standard'])
     titolo = Paragraph('<para alignment=center fontsize=16 spacea=15><strong>Sindacato Nazionale Giornalai d\'Italia</strong></para>', stili['testo_standard'])
     segreteria = Paragraph('<para alignment=center fontsize=14 spaceb=10 spacea=1><strong>Segreteria Interprovinciale Area Marche</strong></para>', stili['testo_standard'])
-    contatti1 = Paragraph('<para leftindent=30>Sede via Macerata, 1 - 60128 Ancona - tel. 347 6933948 - fax 071 7200973</para>', stili['testo_standard'])
+    contatti1 = Paragraph('<para leftindent=30>Sede via Macerata, 4 - 60128 Ancona - tel. 347 6933948 - fax 071 7200973</para>', stili['testo_standard'])
     contatti2 = Paragraph('<para leftindent=30><i>Sito</i>: <a href=http://www.sinaginazionale.it color=blue>www.sinaginazionale.it</a></para>', stili['testo_standard'])
-    contatti3 = Paragraph('<para leftindent=30 spacea=20><i>Email</i>: <a href=mailto:ancona@sinagi.comt>ancona@sinagi.com</a>', stili['testo_standard'])
+    contatti3 = Paragraph('<para leftindent=30 spacea=20><i>Email</i>: <a href=mailto:sinagiancona.servizi@gmail.com>sinagiancona.servizi@gmail.com</a>', stili['testo_standard'])
     logo = get_resized_img('logo.jpg', width=50*mm)
     logo.hAlign = 'CENTER'
     lista_doc.extend((acronimo, titolo, logo, segreteria, contatti1, contatti2, contatti3))
